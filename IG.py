@@ -4,6 +4,7 @@
 #########################
 
 from InstagramAPI import InstagramAPI
+import time
 
 username = input("Enter your Username: ")
 password = input("Enter your Password: ")
@@ -13,14 +14,17 @@ api = InstagramAPI(username, password)
 def main():
     api.login()
 
-    following_list = getFollowingList(getUserID())
-    follower_list = getFollowerList(getUserID())
+    USERID = getUserID()
 
-    print(following_list)
+    following_list = getFollowingList(USERID)
+    follower_list = getFollowerList(USERID)
+
     print(follower_list)
+    print(following_list)
 
     print("Num of followers is", len(follower_list))
     print("Num of following is", len(following_list))
+
 
     api.logout()
 
@@ -37,29 +41,47 @@ def getUserID():
 
 '''
 Gets the user's followers
- Returns them in an array
+Returns them in a set
 '''
 def getFollowerList(userID):
-    api.getUserFollowers(userID)
-    follower = api.LastJson["users"]
-    follower_list = []
-    for i in follower:
-        follower_list.append(i["username"])
+    followers = []
+    max_id = True
+    while max_id:
+        # first iteration hack
+        if(max_id == True):
+            max_id = ''
+        a = api.getUserFollowers(getUserID(), maxid = max_id)
+        followers.extend(api.LastJson.get("users", []))
+        max_id = api.LastJson.get("next_max_id", "")
+        time.sleep(1)
 
-    return(follower_list)
+    followers_list = followers
+
+    user_list = map(lambda x: x["username"], followers_list)
+    followers_set = set(user_list)
+    return list(followers_set)
 
 
 '''
-Gets a list of people the user is following
+Gets a set of people the user is following
 '''
 def getFollowingList(userID):
-    api.getUserFollowings(userID)
-    following = api.LastJson["users"]
-    following_list = []
-    for i in following:
-        following_list.append(i["username"])
+    following = []
+    max_id = True
+    while max_id:
+        # first iteration hack
+        if(max_id == True):
+            max_id = ''
+        a = api.getUserFollowings(getUserID(), maxid = max_id)
+        following.extend(api.LastJson.get("users", []))
+        max_id = api.LastJson.get("next_max_id", "")
+        time.sleep(1)
 
-    return(following_list)
+    following_list = following
+
+    user_list = map(lambda x: x["username"], following_list)
+    following_set = set(user_list)
+    return list(following_set)
 
 
 main()
