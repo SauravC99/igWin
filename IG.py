@@ -25,6 +25,14 @@ def main():
     print("Num of followers is", len(follower_list))
     print("Num of following is", len(following_list))
 
+    #Gets some info from the first post
+    api.getTotalSelfUserFeed()
+    a = api.LastJson
+    print(a["items"][0])
+    print(a["items"][0]["user"]["username"])
+    print(a["items"][0]["caption"]["text"])
+    print(a["items"][0]["image_versions2"]["candidates"][0]["url"])
+
 
     api.logout()
 
